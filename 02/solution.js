@@ -9,18 +9,16 @@ const rows = raw.split("\n").map((r) => r.split(/\s+/).map((i) => parseInt(i)));
 
 // ---- PT 1 -----
 
-const t0 = performance.now();
-
 function checksumDiff(row) {
   const s = [...row].sort((a, b) => a - b);
   return s[s.length - 1] - s[0];
 }
 
+const t0 = performance.now();
 const result = rows.reduce((acc, cur) => acc + checksumDiff(cur), 0);
 const t1 = performance.now();
-
 console.log("pt1: ", result);
-console.log(`time: ${t1 - t0}ms`);
+console.log(`(${t1 - t0}ms)`);
 
 // ---- PT 2 -----
 
@@ -42,8 +40,8 @@ function checksumQuotient(row) {
   }
   return quotient;
 }
-
-const result2 = rows.reduce((acc, cur) => acc + checksumQuotient(cur), 0);
 const t2 = performance.now();
+const result2 = rows.reduce((acc, cur) => acc + checksumQuotient(cur), 0);
+const t3 = performance.now();
 console.log("pt2: ", result2);
-console.log(`time: ${t2 - t1}ms`);
+console.log(`(${t3 - t2}ms)`);
