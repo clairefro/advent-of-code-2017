@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Coordinate Plot with Labels</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+    <style>
+      body {
+        font-family: sans-serif;
+        padding: 1em;
+      }
+      canvas {
+        max-width: 800px;
+        max-height: 800px;
+      }
+    </style>
+  </head>
+  <body>
+    <h2>Coordinate Data (Value Labels)</h2>
+    <canvas id="plot"></canvas>
+    <script>
+      const N = 100;
+      /**
+       * l = layer #
+       * m = max val in layer
+       * w = side width of layer
+       * r = leg from center to layer
+       * wall = 0-3, with wall 0 being bottom and going clockwise
+       * offset = offset from max val in that layer
+       * x = x coord, with center of spiral @0,0
+       * y = y coord, with center of spiral @0,0
+       * c = ceiling corner val
+       * f = floor corner val
+       * mid = mid point val on wall
+       * t = taxicab dist to center
+       */
+      function getInfo(n) {
+        let x = 0;
+        let y = 0;
+        let l = 0;
+        let m = 1; // smallest max
+        if (n === 1) {
+          return {
+            n: 1,
+            l: 0,
+            m: 1,
+            r: 1,
+            w: 1,
+            offset: 0,
+            wall: 0,
+            x,
+            y,
+            c: 1,
+            f: 1,
+            mid: 1,
+            t: 0,
+          };
+        }
+
+        if (n > 0) {
+          while (true) {
+            m = (2 * l + 1) ** 2;
+            if (n <= m) break;
+            l++;
+          }
+        } else {
+          console.log("invalid n val. must be positive");
+        }
+        const w = n === 1 ? 1 : 2 * l + 1;
+        const r = l + 1;
+        const offset = m - n;
+        const wall = Math.floor(offset / (w - 1));
+
+        const c = wall === 3 ? m : m - (w - 1) * wall;
+        const f = m - (w - 1) * (wall + 1);
+        const mid = c - (c - f) / 2;
+
+        switch (wall) {
+          case 0: // bottom wall
+            x = n - mid;
+            y = (r - 1) * -1;
+            break;
+          case 1: // left wall
+            x = (r - 1) * -1;
+            y = n - mid;
+            break;
+          case 2: // top wall
+            x = n - mid;
+            y = r - 1;
+            break;
+          case 3: // right wall
+            x = r - 1;
+            y = n - mid;
+            break;
+        }
+
+        const t = Math.abs(x) + Math.abs(y);
+        return { n, l, m, r, w, offset, wall, x, y, c, f, mid, t };
+      }
+      function getAllCoords(n) {
+        const data = {};
+        for (let i = 1; i <= n; i++) {
+          const info = getInfo(i);
+          data[`${info.x}.${info.y}`] = i;
+        }
+
+        return data;
+      }
+      const rawData = getAllCoords(N);
+      const dataPoints = Object.entries(rawData).map(([coord, value]) => {
+        const [xStr, yStr] = coord.split(".");
+        const x = parseInt(xStr, 10);
+        const y = parseInt(yStr, 10);
+        return { x, y, label: value.toString() };
+      });
+
+      new Chart(document.getElementById("plot"), {
+        type: "scatter",
+        data: {
+          datasets: [
+            {
+              label: "Labeled Points",
+              data: dataPoints,
+              backgroundColor: "rgba(75, 192, 192, 0.8)",
+              pointRadius: 6,
+            },
+          ],
+        },
+        options: {
+          plugins: {
+            datalabels: {
+              align: "top",
+              anchor: "end",
+              font: {
+                weight: "bold",
+              },
+              formatter: (ctx) => ctx.label,
+            },
+            tooltip: {
+              callbacks: {
+                label: (ctx) =>
+                  `(${ctx.raw.x}, ${ctx.raw.y}) → ${ctx.raw.label}`,
+              },
+            },
+          },
+          scales: {
+            x: {
+              title: {
+                display: true,
+                text: "X Axis",
+              },
+              ticks: {
+                stepSize: 1,
+              },
+            },
+            y: {
+              title: {
+                display: true,
+                text: "Y Axis",
+              },
+              ticks: {
+                stepSize: 1,
+              },
+            },
+          },
+        },
+        plugins: [ChartDataLabels],
+      });
+    </script>
+  </body>
+</html>
