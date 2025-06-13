@@ -44,6 +44,24 @@ function isValid2(phrase) {
   return valid;
 }
 
+function isValid3(phrase) {
+  let valid = true;
+  const sorted = {};
+  const words = phrase.split(" ");
+  for (let i = 0; i < words.length; i++) {
+    const s = words[i].split(" ").sort().join("");
+    sorted[s] = 1;
+    if (s in sorted) {
+      valid = false;
+      break;
+    }
+  }
+  return valid;
+}
+
 console.log("PT2");
 const valids2 = phrases.map(isValid2).filter(Boolean).length;
 console.log(valids2);
+
+const valids3 = phrases.map(isValid2).filter(Boolean).length;
+console.log(valids3);
