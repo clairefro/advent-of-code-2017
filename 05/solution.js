@@ -38,10 +38,9 @@ console.log("elapsed: ", t2 - t1, "ms");
 // ------ PT 2 ---
 function jump2(ins, jumps = 0, i = 0) {
   if (ins[i] === undefined) return jumps;
-  jumps++;
-  ins[i] = ins[i] >= 3 ? ins[i] - 1 : ins[i] + 1;
   const next = i + ins[i];
-  return () => jump2(ins, jumps, next);
+  ins[i] = ins[i] >= 3 ? ins[i] - 1 : ins[i] + 1;
+  return () => jump2(ins, jumps + 1, next);
 }
 
 console.log("PT2");
