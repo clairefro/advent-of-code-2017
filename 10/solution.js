@@ -7,39 +7,33 @@ const raw = load(__dirname + "/input.txt");
 // ---- PART 1 ---
 const inputs = raw.split(",").map((n) => +n);
 
-function wrap(arr, i) {
-  return arr[i % arr.length];
-}
-
-const rope = Array.from(Array(256).keys());
-
 function transform(list, i, size) {
-  const updated = [...list];
   const seg = [];
   for (let k = 0; k < size; k++) {
     seg.push(list[(i + k) % list.length]);
   }
   seg.reverse();
   for (let j = 0; j < size; j++) {
-    updated[(i + j) % updated.length] = seg[j];
+    list[(i + j) % list.length] = seg[j];
   }
-  return updated;
+  return list;
 }
 
-function knot(list, inp) {
-  let final = [...list];
+function knot(ropeSize, inp) {
+  let list = Array.from(Array(ropeSize).keys());
+
   let skip = 0;
   let curI = 0;
   for (let i = 0; i < inp.length; i++) {
     const size = inp[i];
-    final = transform(final, curI, size);
+    list = transform(list, curI, size);
     curI = size + skip;
     skip++;
   }
-  return final;
+  return list;
 }
 
-const knotted = knot(rope, inputs);
+const knotted = knot(256, inputs);
 
 console.log(knotted);
 console.log("Product: ", knotted[0] * knotted[1]);
@@ -48,20 +42,20 @@ console.log("Product: ", knotted[0] * knotted[1]);
 
 const byteStrL = raw.split("").map((c) => c.charCodeAt(0));
 
-function knotHashSparse(list, inp) {
-  let final = [...list];
+function knotHashSparse(ropeSize, inp) {
+  let list = Array.from(Array(ropeSize).keys());
   const salt = [17, 31, 73, 47, 23];
   let saltedInp = [...inp, ...salt];
   let curI = 0;
   let skip = 0;
   for (let i = 0; i < 64; i++) {
     for (let length of saltedInp) {
-      final = transform(final, curI, length);
-      curI = (curI + length + skip) % final.length;
+      list = transform(list, curI, length);
+      curI = (curI + length + skip) % list.length;
       skip++;
     }
   }
-  return final;
+  return list;
 }
 
 function knotHashDense(sparse) {
@@ -80,7 +74,7 @@ function toHex(denseHash) {
   return denseHash.map((h) => h.toString(16).padStart(2, "0")).join("");
 }
 
-const sparse = knotHashSparse(rope, byteStrL);
+const sparse = knotHashSparse(256, byteStrL);
 
 const dense = knotHashDense(sparse);
 console.log("dense (dec)", dense);
