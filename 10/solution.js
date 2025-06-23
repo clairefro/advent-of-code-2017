@@ -27,7 +27,7 @@ function knot(ropeSize, inp) {
   for (let i = 0; i < inp.length; i++) {
     const size = inp[i];
     list = transform(list, curI, size);
-    curI = size + skip;
+    curI = (curI + size + skip) % list.length;
     skip++;
   }
   return list;
