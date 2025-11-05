@@ -1083,6 +1083,7 @@ p=<-886,2415,982>, v=<-129,344,142>, a=<9,-29,-12>`;
       let simulationInterval;
 
       let audioContext;
+
       function createBeepSound() {
         if (!audioContext) {
           audioContext = new (window.AudioContext ||
@@ -1128,7 +1129,6 @@ p=<-886,2415,982>, v=<-129,344,142>, a=<9,-29,-12>`;
         const diff = temp.length - remainingParticles.length;
         if (diff > 0) {
           console.log(`tick ${currentTick} collisions: ${diff}`);
-          // Play light beep sound on collision
           try {
             createBeepSound();
           } catch (e) {
@@ -1244,7 +1244,7 @@ p=<-886,2415,982>, v=<-129,344,142>, a=<9,-29,-12>`;
         sphereRadius = newRadius;
 
         points.forEach((sphere) => {
-          sphere.geometry.dispose(); // Clean up old geometry
+          sphere.geometry.dispose();
           sphere.geometry = new THREE.SphereGeometry(sphereRadius, 12, 12);
         });
       }
