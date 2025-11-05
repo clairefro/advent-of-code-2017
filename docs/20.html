@@ -1215,8 +1215,7 @@ p=<-886,2415,982>, v=<-129,344,142>, a=<9,-29,-12>`;
         0.1,
         10000
       );
-      camera.position.set(50, 50, 50); // Changed from (10, 10, 10) for more zoomed out view
-
+      camera.position.set(50, 50, 50);
       const canvas = document.getElementById("threejs-canvas");
       const renderer = new THREE.WebGLRenderer({
         canvas: canvas,
@@ -1236,12 +1235,11 @@ p=<-886,2415,982>, v=<-129,344,142>, a=<9,-29,-12>`;
       const axesHelper = new THREE.AxesHelper(5);
       scene.add(axesHelper);
 
-      // Create spheres for points
+      // spheres for points
       let sphereRadius = 10;
       const material = new THREE.MeshBasicMaterial({ color: 0xff6600 });
       const points = [];
 
-      // Function to update sphere sizes
       function updateSphereSize(newRadius) {
         sphereRadius = newRadius;
 
@@ -1251,7 +1249,6 @@ p=<-886,2415,982>, v=<-129,344,142>, a=<9,-29,-12>`;
         });
       }
 
-      // Create a sphere for each particle
       particles.forEach((particle, index) => {
         const geometry = new THREE.SphereGeometry(sphereRadius, 12, 12);
         const sphere = new THREE.Mesh(geometry, material);
@@ -1260,7 +1257,6 @@ p=<-886,2415,982>, v=<-129,344,142>, a=<9,-29,-12>`;
         points.push(sphere);
       });
 
-      // Add button click handlers
       document.querySelector("#runBtn").addEventListener("click", () => {
         if (simulationRunning) {
           stopSimulation();
@@ -1273,14 +1269,12 @@ p=<-886,2415,982>, v=<-129,344,142>, a=<9,-29,-12>`;
         restartSimulation();
       });
 
-      // Add slider event handler
       document.querySelector("#sizeSlider").addEventListener("input", (e) => {
         const newSize = parseFloat(e.target.value);
         updateSphereSize(newSize);
         document.getElementById("sizeValue").textContent = newSize;
       });
 
-      // Animate
       function animate() {
         requestAnimationFrame(animate);
         controls.update();
