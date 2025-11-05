@@ -19,6 +19,18 @@
       <button id="restartBtn">Restart</button>
       <p>Ticks: <span id="ticks">0</span></p>
       <p>Particles: <span id="particles">1000</span></p>
+      <div>
+        <label for="sizeSlider">Particle Size: </label>
+        <input
+          type="range"
+          id="sizeSlider"
+          min="1"
+          max="50"
+          value="10"
+          step="1"
+        />
+        <span id="sizeValue">10</span>
+      </div>
     </div>
     <canvas id="threejs-canvas"></canvas>
     <script type="importmap">
@@ -1067,6 +1079,32 @@ p=<-886,2415,982>, v=<-129,344,142>, a=<9,-29,-12>`;
       let remainingParticles = [...particles];
       let simulationInterval;
 
+      let audioContext;
+      function createBeepSound() {
+        if (!audioContext) {
+          audioContext = new (window.AudioContext ||
+            window.webkitAudioContext)();
+        }
+
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+
+        oscillator.type = "sine";
+        oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+
+        gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(
+          0.01,
+          audioContext.currentTime + 0.1
+        );
+
+        oscillator.start(audioContext.currentTime);
+        oscillator.stop(audioContext.currentTime + 0.1);
+      }
+
       function stepSimulation() {
         if (!simulationRunning) return;
 
@@ -1087,6 +1125,12 @@ p=<-886,2415,982>, v=<-129,344,142>, a=<9,-29,-12>`;
         const diff = temp.length - remainingParticles.length;
         if (diff > 0) {
           console.log(`tick ${currentTick} collisions: ${diff}`);
+          // Play light beep sound on collision
+          try {
+            createBeepSound();
+          } catch (e) {
+            console.log("Audio play failed:", e);
+          }
         }
 
         updateVisualization();
@@ -1190,12 +1234,23 @@ p=<-886,2415,982>, v=<-129,344,142>, a=<9,-29,-12>`;
       scene.add(axesHelper);
 
       // Create spheres for points
-      const geometry = new THREE.SphereGeometry(10, 12, 12);
+      let sphereRadius = 10;
       const material = new THREE.MeshBasicMaterial({ color: 0xff6600 });
       const points = [];
 
+      // Function to update sphere sizes
+      function updateSphereSize(newRadius) {
+        sphereRadius = newRadius;
+
+        points.forEach((sphere) => {
+          sphere.geometry.dispose(); // Clean up old geometry
+          sphere.geometry = new THREE.SphereGeometry(sphereRadius, 12, 12);
+        });
+      }
+
       // Create a sphere for each particle
       particles.forEach((particle, index) => {
+        const geometry = new THREE.SphereGeometry(sphereRadius, 12, 12);
         const sphere = new THREE.Mesh(geometry, material);
         sphere.position.set(particle.p.x, particle.p.y, particle.p.z);
         scene.add(sphere);
@@ -1213,6 +1268,13 @@ p=<-886,2415,982>, v=<-129,344,142>, a=<9,-29,-12>`;
 
       document.querySelector("#restartBtn").addEventListener("click", () => {
         restartSimulation();
+      });
+
+      // Add slider event handler
+      document.querySelector("#sizeSlider").addEventListener("input", (e) => {
+        const newSize = parseFloat(e.target.value);
+        updateSphereSize(newSize);
+        document.getElementById("sizeValue").textContent = newSize;
       });
 
       // Animate
