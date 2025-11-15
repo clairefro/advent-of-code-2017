@@ -69,7 +69,9 @@ function bitsToStr(bits, size) {
 
 // --- MUTATORS -----
 
-// Rotate an input by n degrees (positive or negative)
+// arr = [0,0]
+
+// rotate an input by n degrees (positive or negative)
 // rotateN(["..#/.../..."], 90) => returns [".../.../#.."]
 function rotateN(input, degrees) {
   const size = getSize(input);
@@ -304,7 +306,7 @@ function run(iter) {
     }
 
     iterations++;
-  }, 500);
+  }, 0);
 }
 
-run(8);
+run(18);
