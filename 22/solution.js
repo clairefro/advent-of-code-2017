@@ -166,7 +166,6 @@ const map = raw.split("\n").map((r) => r.split(""));
 
 class EvolvedCarrier {
   bursts = 0;
-  history = [];
   infected = 0;
   cleaned = 0;
   weakened = 0;
@@ -251,28 +250,24 @@ class EvolvedCarrier {
     // do not change dir
     this.updateMap(x, y, this.STATUS.INFECTED);
     this.infected += 1;
-    this.history.push(`${x},${y}#`);
   }
 
   clean(x, y) {
     this.updateDirReverse();
     this.updateMap(x, y, this.STATUS.CLEAN);
     this.cleaned += 1;
-    this.history.push(`${x},${y}.`);
   }
 
   flag(x, y) {
     this.changeDirRight();
     this.updateMap(x, y, this.STATUS.FLAGGED);
     this.flagged += 1;
-    this.history.push(`${x},${y}F`);
   }
 
   weaken(x, y) {
     this.changeDirLeft();
     this.updateMap(x, y, this.STATUS.WEAKENED);
     this.weakened += 1;
-    this.history.push(`${x},${y}W`);
   }
 
   updateMap(x, y, symbol) {
@@ -367,9 +362,13 @@ const e = new EvolvedCarrier(map);
 
 console.log("PT2");
 console.log("running...");
+
 const startTime = Date.now();
+
 e.run(10000000);
+
 const endTime = Date.now();
+
 const duration = ((endTime - startTime) / 1000).toFixed(2);
 console.log(`Completed in ${duration} seconds`);
 console.log(e.stats());
